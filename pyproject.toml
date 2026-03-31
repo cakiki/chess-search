@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chess-search"
+version = "0.1.0"
+requires-python = ">=3.10"
+maintainers = [
+  {name = "Christopher Akiki", email = "christopher.akiki@gmail.com"}
+]
+description = "Chess position retrieval"
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+dependencies = [
+    "chess",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[tool.ruff]
+line-length = 120
