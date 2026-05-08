@@ -12,6 +12,12 @@ class BitmapIndex:
                 self.index[token] = BitMap()
             self.index[token].add(position_id)
 
+    def query(self, tokens):
+        bitmaps = [self.index[t] for t in tokens if t in self.index]
+        if not bitmaps:
+            return BitMap()
+        return BitMap.intersection(*bitmaps)
+
     def __ior__(self, other):
         for token, bitmap in other.index.items():
             if token in self.index:
