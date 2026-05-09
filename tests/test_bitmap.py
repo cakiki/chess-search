@@ -12,8 +12,8 @@ def test_build_and_query():
     b.push_san("e5")
     idx.add(2, b)
     assert len(idx) == 34
-    assert idx.query([("P", "e4")]) == BitMap([1, 2])
-    assert idx.query([("P", "e4"), ("p", "e5")]) == BitMap([2])
+    assert idx.query(["P_e4"]) == BitMap([1, 2])
+    assert idx.query(["P_e4", "p_e5"]) == BitMap([2])
 
 
 def test_merge():
@@ -24,10 +24,10 @@ def test_merge():
     b.add(1, board)
     a |= b
     assert len(a) == 33
-    assert a.query([("P", "e2")]) == BitMap([0])
-    assert a.query([("P", "e4")]) == BitMap([1])
+    assert a.query(["P_e2"]) == BitMap([0])
+    assert a.query(["P_e4"]) == BitMap([1])
 
 
 def test_empty_query():
     idx = BitmapIndex()
-    assert idx.query([("N", "z9")]) == BitMap()
+    assert idx.query(["N_z9"]) == BitMap()
