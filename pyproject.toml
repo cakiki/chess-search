@@ -16,6 +16,7 @@ dependencies = [
     "chess",
     "pyroaring",
     "tqdm",
+    "lmdb",
 ]
 
 [project.optional-dependencies]

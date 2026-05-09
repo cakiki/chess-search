@@ -1,5 +1,6 @@
 from pyroaring import BitMap
 from chess_search.utils import position_to_tokens
+import lmdb
 
 
 class BitmapIndex:
@@ -18,6 +19,24 @@ class BitmapIndex:
             return BitMap()
         return BitMap.intersection(*bitmaps)
 
+    def save(self, path):
+        env = lmdb.open(path, map_size=2**40)
+        with env.begin(write=True) as txn:
+            for token, bitmap in self.index.items():
+                txn.put(token.encode(), bitmap.serialize())
+        env.close()
+
+    @classmethod
+    def load(cls, path):
+        idx = cls()
+        env = lmdb.open(path, readonly=True)
+        with env.begin() as txn:
+            cursor = txn.cursor()
+            for key, value in cursor:
+                idx.index[key.decode()] = BitMap.deserialize(value)
+        env.close()
+        return idx
+
     def __ior__(self, other):
         for token, bitmap in other.index.items():
             if token in self.index:
@@ -28,3 +47,10 @@ class BitmapIndex:
 
     def __len__(self):
         return len(self.index)
+    
+    def __repr__(self):
+        tokens = sorted(self.index.keys())
+        preview = ", ".join(tokens[:5])
+        if len(tokens) > 5:
+            preview += ", ..."
+        return f"BitmapIndex(tokens={len(tokens)}, positions={max(max(b) for b in self.index.values()) + 1 if self.index else 0}, keys=[{preview}])"
