@@ -31,3 +31,17 @@ def test_merge():
 def test_empty_query():
     idx = BitmapIndex()
     assert idx.query(["N_z9"]) == BitMap()
+
+def test_save_load(tmp_path):
+    idx = BitmapIndex()
+    b = chess.Board()
+    idx.add(0, b)
+    b.push_san("e4")
+    idx.add(1, b)
+    assert idx.query(["P_e4"]) == BitMap([1])
+    assert idx.query(["P_e2"]) == BitMap([0])
+    idx.save(str(tmp_path / "test_index"))
+    loaded = BitmapIndex.load(str(tmp_path / "test_index"))
+    assert len(loaded) == len(idx)
+    assert loaded.query(["P_e4"]) == BitMap([1])
+    assert loaded.query(["P_e2"]) == BitMap([0])
