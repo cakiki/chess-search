@@ -73,20 +73,20 @@ class BitmapIndex:
 
     def __len__(self):
         return len(self.index)
-    
+
     def __repr__(self):
         tokens = sorted(self.index.keys())
         preview = ", ".join(tokens[:5])
         if len(tokens) > 5:
             preview += ", ..."
         return f"BitmapIndex(tokens={len(tokens)}, positions={max(max(b) for b in self.index.values()) + 1 if self.index else 0}, keys=[{preview}])"
-    
+
     def __contains__(self, token):
         return token in self.index
 
     def __getitem__(self, token):
         return self.index[token]
-    
+
     def __iter__(self):
         return iter(self.index)
 

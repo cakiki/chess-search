@@ -1,5 +1,6 @@
 import chess
 
+
 def position_to_tokens(board):
     tokens = []
     for square in chess.SQUARES:
@@ -7,6 +8,7 @@ def position_to_tokens(board):
         if piece:
             tokens.append(f"{piece.symbol()}_{chess.square_name(square)}")
     return tokens
+
 
 def replay_moves(fen, moves):
     board = chess.Board(fen)
