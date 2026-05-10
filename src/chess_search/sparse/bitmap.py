@@ -1,3 +1,4 @@
+import json
 from pyroaring import BitMap
 from chess_search.utils import position_to_tokens
 import lmdb
@@ -6,6 +7,8 @@ import lmdb
 class BitmapIndex:
     def __init__(self):
         self.index = {}
+        self._next_id = 0
+        self._metadata = []
 
     def add(self, position_id, board):
         for token in position_to_tokens(board):
@@ -20,29 +23,52 @@ class BitmapIndex:
         return BitMap.intersection(*bitmaps)
 
     def save(self, path):
-        env = lmdb.open(path, map_size=2**40)
+        env = lmdb.open(path, map_size=2**40, max_dbs=2)
+        bitmap_db = env.open_db(b"bitmaps")
+        meta_db = env.open_db(b"metadata")
         with env.begin(write=True) as txn:
             for token, bitmap in self.index.items():
-                txn.put(token.encode(), bitmap.serialize())
+                txn.put(token.encode(), bitmap.serialize(), db=bitmap_db)
+            txn.put(b"next_id", str(self._next_id).encode(), db=meta_db)
+            txn.put(b"metadata", json.dumps(self._metadata).encode(), db=meta_db)
         env.close()
 
     @classmethod
     def load(cls, path):
         idx = cls()
-        env = lmdb.open(path, readonly=True)
-        with env.begin() as txn:
-            cursor = txn.cursor()
+        env = lmdb.open(path, readonly=True, max_dbs=2)
+        bitmap_db = env.open_db(b"bitmaps")
+        meta_db = env.open_db(b"metadata")
+        with env.begin(buffers=False) as txn:
+            cursor = txn.cursor(db=bitmap_db)
             for key, value in cursor:
                 idx.index[key.decode()] = BitMap.deserialize(value)
+            meta_raw = txn.get(b"metadata", db=meta_db)
+            if meta_raw:
+                idx._metadata = [tuple(x) for x in json.loads(meta_raw)]
+                idx._next_id = int(txn.get(b"next_id", db=meta_db))
         env.close()
         return idx
 
+    def add_source(self, source_id, boards):
+        for move_idx, board in enumerate(boards):
+            self.add(self._next_id, board)
+            self._metadata.append((source_id, move_idx))
+            self._next_id += 1
+
+    def resolve(self, bitmap):
+        return [self._metadata[pos_id] for pos_id in bitmap]
+
     def __ior__(self, other):
+        offset = self._next_id
         for token, bitmap in other.index.items():
+            shifted = BitMap(pos_id + offset for pos_id in bitmap)
             if token in self.index:
-                self.index[token] |= bitmap
+                self.index[token] |= shifted
             else:
-                self.index[token] = bitmap.copy()
+                self.index[token] = shifted
+        self._metadata.extend(other._metadata)
+        self._next_id += other._next_id
         return self
 
     def __len__(self):
