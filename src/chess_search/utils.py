@@ -2,12 +2,7 @@ import chess
 
 
 def position_to_tokens(board):
-    tokens = []
-    for square in chess.SQUARES:
-        piece = board.piece_at(square)
-        if piece:
-            tokens.append(f"{piece.symbol()}_{chess.square_name(square)}")
-    return tokens
+    return [f"{piece.symbol()}_{chess.square_name(square)}" for square, piece in board.piece_map().items()]
 
 
 def replay_moves(fen, moves):
