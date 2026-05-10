@@ -74,3 +74,22 @@ def test_merge_with_metadata():
     assert a.resolve(a.query(["P_e4"])) == [("puzzle_1", 0)]
     assert a.resolve(a.query(["P_d4"])) == [("puzzle_2", 0)]
     assert a._next_id == 2
+
+def test_fixture_roundtrip():
+    import json
+    from chess_search.utils import replay_moves, position_to_tokens
+
+    with open("tests/fixtures/puzzles-sample.jsonl") as f:
+        puzzles = [json.loads(line) for line in f]
+
+    idx = BitmapIndex()
+    all_boards = []
+    for p in puzzles:
+        boards = replay_moves(p["FEN"], p["Moves"].split())
+        idx.add_source(p["PuzzleId"], boards)
+        all_boards.extend(boards)
+
+    for pos_id in [0, 100, 500, len(all_boards) - 1]:
+        tokens = position_to_tokens(all_boards[pos_id])
+        results = idx.query(tokens)
+        assert pos_id in results
