@@ -59,6 +59,14 @@ class BitmapIndex:
     def resolve(self, bitmap):
         return [self._metadata[pos_id] for pos_id in bitmap]
 
+    @classmethod
+    def build_index(cls, sources):
+        from tqdm import tqdm
+        idx = cls()
+        for source_id, boards in tqdm(sources):
+            idx.add_source(source_id, boards)
+        return idx
+
     def __ior__(self, other):
         offset = self._next_id
         for token, bitmap in other.index.items():
