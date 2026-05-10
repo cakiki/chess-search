@@ -60,10 +60,10 @@ class BitmapIndex:
         return [self._metadata[pos_id] for pos_id in bitmap]
 
     @classmethod
-    def build_index(cls, sources):
+    def build_index(cls, sources, total=None):
         from tqdm import tqdm
         idx = cls()
-        for source_id, boards in tqdm(sources):
+        for source_id, boards in tqdm(sources, total=total):
             idx.add_source(source_id, boards)
         return idx
 
