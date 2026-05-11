@@ -22,6 +22,12 @@ class BitmapIndex:
             return BitMap()
         return BitMap.intersection(*bitmaps)
 
+    def union(self, tokens):
+        bitmaps = [self.index[t] for t in tokens if t in self.index]
+        if not bitmaps:
+            return BitMap()
+        return BitMap.union(*bitmaps)
+
     def save(self, path):
         env = lmdb.open(path, map_size=2**40, max_dbs=2)
         bitmap_db = env.open_db(b"bitmaps")
@@ -34,14 +40,19 @@ class BitmapIndex:
         env.close()
 
     @classmethod
-    def load(cls, path):
+    def load(cls, path, verbose=False):
         idx = cls()
         env = lmdb.open(path, readonly=True, max_dbs=2)
         bitmap_db = env.open_db(b"bitmaps")
         meta_db = env.open_db(b"metadata")
         with env.begin(buffers=False) as txn:
             cursor = txn.cursor(db=bitmap_db)
-            for key, value in cursor:
+            items = cursor.iternext()
+            if verbose:
+                from tqdm import tqdm
+
+                items = tqdm(items, desc="Loading bitmaps")
+            for key, value in items:
                 idx.index[key.decode()] = BitMap.deserialize(value)
             meta_raw = txn.get(b"metadata", db=meta_db)
             if meta_raw:
@@ -62,6 +73,7 @@ class BitmapIndex:
     @classmethod
     def build_index(cls, sources, total=None):
         from tqdm import tqdm
+
         idx = cls()
         for source_id, boards in tqdm(sources, total=total):
             idx.add_source(source_id, boards)

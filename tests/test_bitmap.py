@@ -1,5 +1,5 @@
 import chess
-from chess_search.sparse.bitmap import BitmapIndex
+from chess_search.sparse.bitmap.index import BitmapIndex
 from pyroaring import BitMap
 
 
@@ -74,6 +74,7 @@ def test_merge_with_metadata():
     assert a.resolve(a.query(["P_e4"])) == [("puzzle_1", 0)]
     assert a.resolve(a.query(["P_d4"])) == [("puzzle_2", 0)]
     assert a._next_id == 2
+
 
 def test_fixture_roundtrip():
     import json
