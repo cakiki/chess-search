@@ -9,12 +9,20 @@ class BitmapIndex:
         self.index = {}
         self._next_id = 0
         self._metadata = []
+        self._all_positions = BitMap()
 
     def add(self, position_id, board):
         for token in position_to_tokens(board):
             if token not in self.index:
                 self.index[token] = BitMap()
             self.index[token].add(position_id)
+        self._all_positions.add(position_id)
+
+    def add_source(self, source_id, boards):
+        for move_idx, board in enumerate(boards):
+            self.add(self._next_id, board)
+            self._metadata.append((source_id, move_idx))
+            self._next_id += 1
 
     def query(self, tokens):
         bitmaps = [self.index[t] for t in tokens if t in self.index]
@@ -61,11 +69,7 @@ class BitmapIndex:
         env.close()
         return idx
 
-    def add_source(self, source_id, boards):
-        for move_idx, board in enumerate(boards):
-            self.add(self._next_id, board)
-            self._metadata.append((source_id, move_idx))
-            self._next_id += 1
+
 
     def resolve(self, bitmap):
         return [self._metadata[pos_id] for pos_id in bitmap]

@@ -11,7 +11,7 @@ def test_build_and_query():
     idx.add(1, b)
     b.push_san("e5")
     idx.add(2, b)
-    assert len(idx) == 34
+    assert len(idx) == 36
     assert idx.query(["P_e4"]) == BitMap([1, 2])
     assert idx.query(["P_e4", "p_e5"]) == BitMap([2])
 
@@ -23,7 +23,7 @@ def test_merge():
     board.push_san("e4")
     b.add(1, board)
     a |= b
-    assert len(a) == 33
+    assert len(a) == 35
     assert a.query(["P_e2"]) == BitMap([0])
     assert a.query(["P_e4"]) == BitMap([1])
 
@@ -94,3 +94,106 @@ def test_fixture_roundtrip():
         tokens = position_to_tokens(all_boards[pos_id])
         results = idx.query(tokens)
         assert pos_id in results
+
+
+def test_on_file():
+    from chess_search.sparse.bitmap.query import on_file, anywhere
+
+    idx = BitmapIndex()
+    b = chess.Board()
+    b.push_san("e4")
+    idx.add(0, b)
+    result = on_file(idx, "R", "a")
+    assert 0 in result  # rook on a1
+    result = on_file(idx, "R", "b")
+    assert 0 not in result
+
+
+def test_on_rank():
+    from chess_search.sparse.bitmap.query import on_rank
+
+    idx = BitmapIndex()
+    b = chess.Board()
+    idx.add(0, b)
+    result = on_rank(idx, "P", 2)
+    assert 0 in result  # white pawns on rank 2
+    result = on_rank(idx, "P", 5)
+    assert 0 not in result
+
+
+def test_in_center():
+    from chess_search.sparse.bitmap.query import in_center
+
+    idx = BitmapIndex()
+    b = chess.Board("8/8/8/3N4/4P3/8/8/8 w - - 0 1")  # N on d5, P on e4
+    idx.add(0, b)
+    assert 0 in in_center(idx, "P")
+    assert 0 in in_center(idx, "N")
+    b2 = chess.Board("8/8/8/8/8/5N2/4P3/8 w - - 0 1")  # N on f3, P on e2
+    idx.add(1, b2)
+    assert 1 not in in_center(idx, "P")
+    assert 1 not in in_center(idx, "N")
+
+
+def test_on_color():
+    from chess_search.sparse.bitmap.query import on_color
+
+    idx = BitmapIndex()
+    b = chess.Board("8/8/8/8/8/3R4/8/2B5 w - - 0 1")  # B on c1 (dark), R on d3 (light)
+    idx.add(0, b)
+    assert 0 in on_color(idx, "B", "dark")
+    assert 0 not in on_color(idx, "B", "light")
+    assert 0 in on_color(idx, "R", "light")
+    assert 0 not in on_color(idx, "R", "dark")
+
+def test_empty_square():
+    from chess_search.sparse.bitmap.query import empty_square
+    idx = BitmapIndex()
+    b1 = chess.Board("8/8/8/3N4/8/8/8/8 w - - 0 1")  # knight on d5 only
+    b2 = chess.Board("8/8/8/3N4/4P3/8/8/8 w - - 0 1")  # knight on d5, pawn on e4
+    idx.add(0, b1)
+    idx.add(1, b2)
+    result = empty_square(idx, "e4")
+    assert 0 in result      # e4 is empty in position 0
+    assert 1 not in result   # e4 is occupied in position 1
+
+def test_side_to_move():
+    idx = BitmapIndex()
+    b = chess.Board()  # white to move
+    idx.add(0, b)
+    b.push_san("e4")   # now black to move
+    idx.add(1, b)
+    assert 0 in idx.query(["w"])
+    assert 0 not in idx.query(["b"])
+    assert 1 in idx.query(["b"])
+    assert 1 not in idx.query(["w"])
+
+def test_square_queries():
+    from chess_search.sparse.bitmap.query import on_square, any_white_on, any_black_on, piece_on
+    idx = BitmapIndex()
+    b = chess.Board("8/8/8/3N4/8/8/8/3n4 w - - 0 1")  # white N on d5, black n on d1
+    idx.add(0, b)
+    assert 0 in on_square(idx, "d5")
+    assert 0 not in on_square(idx, "e4")
+    assert 0 in any_white_on(idx, "d5")
+    assert 0 not in any_black_on(idx, "d5")
+    assert 0 in any_black_on(idx, "d1")
+    assert 0 in piece_on(idx, "N", "d5")
+    assert 0 in piece_on(idx, "N", "d1")
+    assert 0 not in piece_on(idx, "B", "d5")
+
+def test_open_and_semi_open_file():
+    from chess_search.sparse.bitmap.query import open_file, semi_open_file
+    idx = BitmapIndex()
+    b1 = chess.Board("8/8/8/8/8/8/8/8 w - - 0 1")          # empty board
+    b2 = chess.Board("8/8/8/8/4P3/8/8/8 w - - 0 1")        # white pawn on e4
+    b3 = chess.Board("8/4p3/8/8/4P3/8/8/8 w - - 0 1")      # both pawns on e file
+    idx.add(0, b1)
+    idx.add(1, b2)
+    idx.add(2, b3)
+    assert 0 in open_file(idx, "e")
+    assert 1 not in open_file(idx, "e")
+    assert 2 not in open_file(idx, "e")
+    assert 1 in semi_open_file(idx, "e", "black")   # no black pawns, white pawn present
+    assert 1 not in semi_open_file(idx, "e", "white")
+    assert 2 not in semi_open_file(idx, "e", "white")

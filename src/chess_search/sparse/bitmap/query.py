@@ -30,3 +30,32 @@ def on_color(idx, piece, color):
         if (ord(f) - ord("a") + r - 1) % 2 == (0 if color == "dark" else 1)
     ]
     return idx.union([f"{piece}_{sq}" for sq in squares])
+
+def empty_square(idx, square):
+    all_pieces = [f"{p}_{square}" for p in "PNBRQKpnbrqk"]
+    occupied = idx.union(all_pieces)
+    return idx._all_positions - occupied
+
+def on_square(idx, square):
+    """Any piece at all on this square."""
+    return idx.union([f"{p}_{square}" for p in "PNBRQKpnbrqk"])
+
+def any_white_on(idx, square):
+    return idx.union([f"{p}_{square}" for p in "PNBRQK"])
+
+def any_black_on(idx, square):
+    return idx.union([f"{p}_{square}" for p in "pnbrqk"])
+
+def piece_on(idx, piece_type, square):
+    return idx.union([f"{piece_type.upper()}_{square}", f"{piece_type.lower()}_{square}"])
+
+def open_file(idx, file):
+    white_pawns = on_file(idx, "P", file)
+    black_pawns = on_file(idx, "p", file)
+    return idx._all_positions - white_pawns - black_pawns
+
+def semi_open_file(idx, file, color):
+    if color == "white":
+        return (idx._all_positions - on_file(idx, "P", file)) & on_file(idx, "p", file)
+    else:
+        return (idx._all_positions - on_file(idx, "p", file)) & on_file(idx, "P", file)
