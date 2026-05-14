@@ -59,3 +59,17 @@ def semi_open_file(idx, file, color):
         return (idx._all_positions - on_file(idx, "P", file)) & on_file(idx, "p", file)
     else:
         return (idx._all_positions - on_file(idx, "p", file)) & on_file(idx, "P", file)
+    
+def flipcolor(tokens):
+    return [f"{t[0].swapcase()}{t[1:]}" for t in tokens]
+
+def mirror_vertical(tokens):
+    flip = str.maketrans("abcdefgh", "hgfedcba")
+    return [t[0] + "_" + t[2].translate(flip) + t[3:] for t in tokens]
+
+def mirror_horizontal(tokens):
+    flip = str.maketrans("12345678", "87654321")
+    return [t[0] + "_" + t[2] + t[3].translate(flip) for t in tokens]
+
+def rotate_180(tokens):
+    return mirror_horizontal(mirror_vertical(tokens))

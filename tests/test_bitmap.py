@@ -11,7 +11,7 @@ def test_build_and_query():
     idx.add(1, b)
     b.push_san("e5")
     idx.add(2, b)
-    assert len(idx) == 36
+    assert len(idx) == 48
     assert idx.query(["P_e4"]) == BitMap([1, 2])
     assert idx.query(["P_e4", "p_e5"]) == BitMap([2])
 
@@ -23,7 +23,7 @@ def test_merge():
     board.push_san("e4")
     b.add(1, board)
     a |= b
-    assert len(a) == 35
+    assert len(a) == 47
     assert a.query(["P_e2"]) == BitMap([0])
     assert a.query(["P_e4"]) == BitMap([1])
 
@@ -95,6 +95,22 @@ def test_fixture_roundtrip():
         results = idx.query(tokens)
         assert pos_id in results
 
+def test_pgn_indexing():
+    import chess.pgn
+    from chess_search.sparse.bitmap.query import on_file
+    idx = BitmapIndex()
+    with open("tests/fixtures/lichess_db_broadcast_2020-04.pgn") as f:
+        while (game := chess.pgn.read_game(f)) is not None:
+            boards = []
+            board = game.board()
+            for move in game.mainline_moves():
+                board.push(move)
+                boards.append(board.copy())
+            if boards:
+                idx.add_source(game.headers.get("Site", ""), boards)
+    assert len(idx) == 710
+    assert idx._next_id == 7606
+    assert len(on_file(idx, "R", "b")) == 557
 
 def test_on_file():
     from chess_search.sparse.bitmap.query import on_file, anywhere
@@ -197,3 +213,45 @@ def test_open_and_semi_open_file():
     assert 1 in semi_open_file(idx, "e", "black")   # no black pawns, white pawn present
     assert 1 not in semi_open_file(idx, "e", "white")
     assert 2 not in semi_open_file(idx, "e", "white")
+
+def test_flipcolor():
+    from chess_search.sparse.bitmap.query import flipcolor
+    assert flipcolor(["P_e4", "N_f3"]) == ["p_e4", "n_f3"]
+    assert flipcolor(["p_e4", "n_f3"]) == ["P_e4", "N_f3"]
+
+
+def test_mirror_vertical():
+    from chess_search.sparse.bitmap.query import mirror_vertical
+    assert mirror_vertical(["P_e4", "N_f3"]) == ["P_d4", "N_c3"]
+
+
+def test_mirror_horizontal():
+    from chess_search.sparse.bitmap.query import mirror_horizontal
+    assert mirror_horizontal(["P_e4", "N_f3"]) == ["P_e5", "N_f6"]
+
+
+def test_rotate_180():
+    from chess_search.sparse.bitmap.query import rotate_180
+    assert rotate_180(["P_e4"]) == ["P_d5"]
+
+
+def test_flipcolor_with_index():
+    from chess_search.sparse.bitmap.query import flipcolor
+    idx = BitmapIndex()
+    b1 = chess.Board("8/8/8/8/4P3/5N2/8/8 w - - 0 1")  # white P e4, N f3
+    b2 = chess.Board("8/8/8/8/4p3/5n2/8/8 w - - 0 1")  # black p e4, n f3
+    idx.add(0, b1)
+    idx.add(1, b2)
+    tokens = ["P_e4", "N_f3"]
+    assert idx.query(tokens) == BitMap([0])
+    assert idx.query(flipcolor(tokens)) == BitMap([1])
+
+def test_piece_counts():
+    idx = BitmapIndex()
+    b = chess.Board("8/8/8/8/4P3/5N2/8/8 w - - 0 1")  # 1 white pawn, 1 white knight
+    idx.add(0, b)
+    assert 0 in idx.query(["P_count_1"])
+    assert 0 in idx.query(["N_count_1"])
+    assert 0 in idx.query(["Q_count_0"])
+    assert 0 not in idx.query(["P_count_2"])
+    
