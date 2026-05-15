@@ -83,6 +83,21 @@ class BitmapIndex:
             idx.add_source(source_id, boards)
         return idx
 
+    def push_to_hub(self, repo_id):
+        import tempfile
+        from huggingface_hub import HfApi
+        with tempfile.TemporaryDirectory() as tmp:
+            self.save(tmp)
+            api = HfApi()
+            api.create_repo(repo_id, repo_type="dataset", exist_ok=True)
+            api.upload_folder(folder_path=tmp, repo_id=repo_id, repo_type="dataset", ignore_patterns=["lock.mdb"])
+
+    @classmethod
+    def load_from_hub(cls, repo_id, verbose=False):
+        from huggingface_hub import snapshot_download
+        local_dir = snapshot_download(repo_id=repo_id, repo_type="dataset")
+        return cls.load(local_dir, verbose=verbose)
+
     def __ior__(self, other):
         offset = self._next_id
         for token, bitmap in other.index.items():

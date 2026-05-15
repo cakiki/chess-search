@@ -20,6 +20,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+hf  = ["huggingface_hub"]
 dev = ["pytest", "ruff"]
 
 [tool.hatch.build.targets.wheel]
