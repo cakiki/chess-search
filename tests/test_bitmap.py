@@ -11,7 +11,7 @@ def test_build_and_query():
     idx.add(1, b)
     b.push_san("e5")
     idx.add(2, b)
-    assert len(idx) == 48
+    assert len(idx) == 49
     assert idx.query(["P_e4"]) == BitMap([1, 2])
     assert idx.query(["P_e4", "p_e5"]) == BitMap([2])
 
@@ -23,7 +23,7 @@ def test_merge():
     board.push_san("e4")
     b.add(1, board)
     a |= b
-    assert len(a) == 47
+    assert len(a) == 48
     assert a.query(["P_e2"]) == BitMap([0])
     assert a.query(["P_e4"]) == BitMap([1])
 
@@ -108,7 +108,7 @@ def test_pgn_indexing():
                 boards.append(board.copy())
             if boards:
                 idx.add_source(game.headers.get("Site", ""), boards)
-    assert len(idx) == 710
+    assert len(idx) == 713
     assert idx._next_id == 7606
     assert len(on_file(idx, "R", "b")) == 557
 

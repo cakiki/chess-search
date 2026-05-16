@@ -98,6 +98,19 @@ class BitmapIndex:
         local_dir = snapshot_download(repo_id=repo_id, repo_type="dataset")
         return cls.load(local_dir, verbose=verbose)
 
+    def info(self, verbose=False):
+        total_bytes = 0
+        for token in sorted(self.index):
+            s = self.index[token].get_statistics()
+            token_bytes = s["n_bytes_array_containers"] + s["n_bytes_run_containers"] + s["n_bytes_bitset_containers"]
+            total_bytes += token_bytes
+            if verbose:
+                print(f"{token}: cardinality={s['cardinality']}, bytes={token_bytes}")
+        print(f"tokens: {len(self.index)}")
+        print(f"positions: {self._next_id}")
+        print(f"total bitmap memory: {total_bytes / 1024:.1f} KB")
+        print(f"avg per token: {total_bytes / len(self.index):.0f} bytes")
+
     def __ior__(self, other):
         offset = self._next_id
         for token, bitmap in other.index.items():
