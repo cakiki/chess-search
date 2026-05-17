@@ -69,8 +69,6 @@ class BitmapIndex:
         env.close()
         return idx
 
-
-
     def resolve(self, bitmap):
         return [self._metadata[pos_id] for pos_id in bitmap]
 
@@ -86,6 +84,7 @@ class BitmapIndex:
     def push_to_hub(self, repo_id):
         import tempfile
         from huggingface_hub import HfApi
+
         with tempfile.TemporaryDirectory() as tmp:
             self.save(tmp)
             api = HfApi()
@@ -95,6 +94,7 @@ class BitmapIndex:
     @classmethod
     def load_from_hub(cls, repo_id, verbose=False):
         from huggingface_hub import snapshot_download
+
         local_dir = snapshot_download(repo_id=repo_id, repo_type="dataset")
         return cls.load(local_dir, verbose=verbose)
 
