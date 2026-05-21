@@ -1,63 +1,80 @@
 from dataclasses import dataclass
 
+
 class Query:
-    def __and__(self, other): return And(self, other)
-    def __or__(self, other): return Or(self, other)
-    def __invert__(self): return Not(self)
+    def __and__(self, other):
+        return And(self, other)
+
+    def __or__(self, other):
+        return Or(self, other)
+
+    def __invert__(self):
+        return Not(self)
+
 
 @dataclass(frozen=True)
 class PieceOn(Query):
     piece: str
     square: str
 
+
 @dataclass(frozen=True)
 class OnFile(Query):
     piece: str
     file: str
+
 
 @dataclass(frozen=True)
 class OnRank(Query):
     piece: str
     rank: int
 
+
 @dataclass(frozen=True)
 class InCenter(Query):
     piece: str
+
 
 @dataclass(frozen=True)
 class Anywhere(Query):
     piece: str
 
+
 @dataclass(frozen=True)
 class Empty(Query):
     square: str
+
 
 @dataclass(frozen=True)
 class OpenFile(Query):
     file: str
 
+
 @dataclass(frozen=True)
 class Phase(Query):
     phase: str
+
 
 @dataclass(frozen=True)
 class And(Query):
     left: Query
     right: Query
 
+
 @dataclass(frozen=True)
 class Or(Query):
     left: Query
     right: Query
 
+
 @dataclass(frozen=True)
 class Not(Query):
     child: Query
 
+
 from pyroaring import BitMap
-from chess_search.sparse.bitmap.query import (
-    on_file, on_rank, in_center, anywhere, empty_square, open_file
-)
+from chess_search.sparse.bitmap.query import on_file, on_rank, in_center, anywhere, empty_square, open_file
+
 
 def execute(expr, idx):
     match expr:
