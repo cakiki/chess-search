@@ -1,0 +1,29 @@
+start: _NL? line (_NL line)* _NL?
+
+?line: expr
+
+?expr: expr "or" expr     -> or_expr
+     | "not" expr         -> not_expr
+     | "(" expr ")"
+     | predicate
+
+?predicate: piece "on" FILE "-file"      -> on_file
+          | piece "on" RANK "-rank"      -> on_rank
+          | piece "in" "center"          -> in_center
+          | piece "anywhere"             -> anywhere
+          | "empty" SQUARE               -> empty
+          | "open" FILE "-file"          -> open_file
+          | "phase" PHASE                -> phase
+          | piece "on" SQUARE            -> piece_on
+
+piece: PIECE_NAME
+
+PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn"
+FILE: /[a-h]/
+RANK: /[1-8]/
+SQUARE: /[a-h][1-8]/
+PHASE: "opening" | "middlegame" | "endgame"
+_NL: /\n/+
+
+%import common.WS_INLINE
+%ignore WS_INLINE
