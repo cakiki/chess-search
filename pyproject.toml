@@ -17,6 +17,7 @@ dependencies = [
     "pyroaring",
     "tqdm",
     "lmdb",
+    "lark",
 ]
 
 [project.optional-dependencies]
