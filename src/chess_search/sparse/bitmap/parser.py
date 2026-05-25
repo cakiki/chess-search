@@ -13,6 +13,7 @@ from chess_search.sparse.bitmap.expressions import (
     Or,
     Phase,
     PieceOn,
+    SideToMove,
 )
 
 GRAMMAR_PATH = Path(__file__).parent / "grammars" / "english.lark"
@@ -65,8 +66,13 @@ class QueryTransformer(Transformer):
         for a in args[1:]:
             result = And(result, a)
         return result
+    
+    def white_to_move(self, args):
+        return SideToMove("w")
 
-
+    def black_to_move(self, args):
+        return SideToMove("b")
+    
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")
 
 

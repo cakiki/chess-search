@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from chess_search.sparse.bitmap.query import on_file, on_rank, in_center, anywhere, empty_square, open_file
 
 
 class Query:
@@ -71,9 +72,9 @@ class Or(Query):
 class Not(Query):
     child: Query
 
-
-from pyroaring import BitMap
-from chess_search.sparse.bitmap.query import on_file, on_rank, in_center, anywhere, empty_square, open_file
+@dataclass(frozen=True)
+class SideToMove(Query):
+    color: str
 
 
 def execute(expr, idx):
@@ -100,5 +101,7 @@ def execute(expr, idx):
             return execute(left, idx) | execute(right, idx)
         case Not(child):
             return idx._all_positions - execute(child, idx)
+        case SideToMove(color):
+            return idx.query([color])
         case _:
             raise ValueError(f"unknown expression: {expr}")

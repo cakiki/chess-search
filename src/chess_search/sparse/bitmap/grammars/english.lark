@@ -16,6 +16,8 @@ start: _NL? line (_NL line)* _NL?
           | "open" FILE "-file"          -> open_file
           | "phase" PHASE                -> phase
           | piece "on" SQUARE            -> piece_on
+          | "white" "to" "move"          -> white_to_move
+          | "black" "to" "move"          -> black_to_move
 
 piece: PIECE_NAME
 
