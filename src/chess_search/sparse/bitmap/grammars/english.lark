@@ -3,6 +3,7 @@ start: _NL? line (_NL line)* _NL?
 ?line: expr
 
 ?expr: expr "or" expr     -> or_expr
+     | expr "and" expr    -> and_expr
      | "not" expr         -> not_expr
      | "(" expr ")"
      | predicate
