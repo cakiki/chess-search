@@ -16,8 +16,7 @@ start: _NL? line (_NL line)* _NL?
           | "open" FILE "-file"          -> open_file
           | "phase" PHASE                -> phase
           | piece "on" SQUARE            -> piece_on
-          | "white" "to" "move"          -> white_to_move
-          | "black" "to" "move"          -> black_to_move
+          | COLOR "to" "move"          -> side_to_move
 
 piece: PIECE_NAME
 
@@ -26,6 +25,7 @@ FILE: /[a-h]/
 RANK: /[1-8]/
 SQUARE: /[a-h][1-8]/
 PHASE: "opening" | "middlegame" | "endgame"
+COLOR: "white" | "black"
 _NL: /\n/+
 
 %import common.WS_INLINE

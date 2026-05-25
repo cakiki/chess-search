@@ -67,11 +67,8 @@ class QueryTransformer(Transformer):
             result = And(result, a)
         return result
     
-    def white_to_move(self, args):
-        return SideToMove("w")
-
-    def black_to_move(self, args):
-        return SideToMove("b")
+    def side_to_move(self, args):
+        return SideToMove("w" if str(args[0]) == "white" else "b")
     
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")
 
