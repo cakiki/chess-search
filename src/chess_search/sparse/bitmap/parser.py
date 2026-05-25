@@ -50,6 +50,9 @@ class QueryTransformer(Transformer):
 
     def or_expr(self, args):
         return Or(args[0], args[1])
+    
+    def and_expr(self, args):
+        return And(args[0], args[1])
 
     def not_expr(self, args):
         return Not(args[0])
