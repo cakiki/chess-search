@@ -78,7 +78,8 @@ def test_merge_with_metadata():
 
 def test_fixture_roundtrip():
     import json
-    from chess_search.utils import replay_moves, position_to_tokens
+    from chess_search.sources import replay_moves 
+    from chess_search.indexes.bitmap.tokens import position_to_tokens
 
     with open("tests/fixtures/puzzles-sample.jsonl") as f:
         puzzles = [json.loads(line) for line in f]

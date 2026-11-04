@@ -1,6 +1,6 @@
 import json
 from pyroaring import BitMap
-from chess_search.utils import position_to_tokens
+from chess_search.indexes.bitmap.tokens import position_to_tokens
 import lmdb
 
 
