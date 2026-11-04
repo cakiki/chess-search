@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from chess_search.indexes.bitmap.query import on_file, on_rank, in_center, anywhere, empty_square, open_file
+
+from chess_search.indexes.bitmap.query import anywhere, empty_square, in_center, on_file, on_rank, open_file
 
 
 class Query:
@@ -71,6 +72,7 @@ class Or(Query):
 @dataclass(frozen=True)
 class Not(Query):
     child: Query
+
 
 @dataclass(frozen=True)
 class SideToMove(Query):

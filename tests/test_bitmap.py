@@ -1,6 +1,7 @@
 import chess
-from chess_search.indexes.bitmap.index import BitmapIndex
 from pyroaring import BitMap
+
+from chess_search.indexes.bitmap.index import BitmapIndex
 
 
 def test_build_and_query():
@@ -78,8 +79,9 @@ def test_merge_with_metadata():
 
 def test_fixture_roundtrip():
     import json
-    from chess_search.sources import replay_moves 
+
     from chess_search.indexes.bitmap.tokens import position_to_tokens
+    from chess_search.sources import replay_moves
 
     with open("tests/fixtures/puzzles-sample.jsonl") as f:
         puzzles = [json.loads(line) for line in f]
@@ -99,6 +101,7 @@ def test_fixture_roundtrip():
 
 def test_pgn_indexing():
     import chess.pgn
+
     from chess_search.indexes.bitmap.query import on_file
 
     idx = BitmapIndex()
@@ -117,7 +120,7 @@ def test_pgn_indexing():
 
 
 def test_on_file():
-    from chess_search.indexes.bitmap.query import on_file, anywhere
+    from chess_search.indexes.bitmap.query import on_file
 
     idx = BitmapIndex()
     b = chess.Board()
@@ -193,7 +196,7 @@ def test_side_to_move():
 
 
 def test_square_queries():
-    from chess_search.indexes.bitmap.query import on_square, any_white_on, any_black_on, piece_on
+    from chess_search.indexes.bitmap.query import any_black_on, any_white_on, on_square, piece_on
 
     idx = BitmapIndex()
     b = chess.Board("8/8/8/3N4/8/8/8/3n4 w - - 0 1")  # white N on d5, black n on d1

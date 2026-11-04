@@ -1,5 +1,6 @@
 import chess
 
+
 def replay_moves(fen, moves):
     board = chess.Board(fen)
     positions = []

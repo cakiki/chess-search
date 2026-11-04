@@ -1,4 +1,5 @@
 import chess
+
 from chess_search.features import game_phase
 
 

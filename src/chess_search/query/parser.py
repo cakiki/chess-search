@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from lark import Lark, Transformer
 
 from chess_search.query.expressions import (
@@ -51,7 +52,7 @@ class QueryTransformer(Transformer):
 
     def or_expr(self, args):
         return Or(args[0], args[1])
-    
+
     def and_expr(self, args):
         return And(args[0], args[1])
 
@@ -66,10 +67,11 @@ class QueryTransformer(Transformer):
         for a in args[1:]:
             result = And(result, a)
         return result
-    
+
     def side_to_move(self, args):
         return SideToMove("w" if str(args[0]) == "white" else "b")
-    
+
+
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")
 
 

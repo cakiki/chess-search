@@ -1,7 +1,9 @@
 import json
-from pyroaring import BitMap
-from chess_search.indexes.bitmap.tokens import position_to_tokens
+
 import lmdb
+from pyroaring import BitMap
+
+from chess_search.indexes.bitmap.tokens import position_to_tokens
 
 
 class BitmapIndex:
@@ -83,6 +85,7 @@ class BitmapIndex:
 
     def push_to_hub(self, repo_id):
         import tempfile
+
         from huggingface_hub import HfApi
 
         with tempfile.TemporaryDirectory() as tmp:
