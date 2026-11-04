@@ -275,3 +275,19 @@ def test_piece_counts():
     assert 0 in idx.query(["N_count_1"])
     assert 0 in idx.query(["Q_count_0"])
     assert 0 not in idx.query(["P_count_2"])
+
+def test_empty_square_after_load(tmp_path):
+    from chess_search.indexes.bitmap.query import empty_square
+    idx = BitmapIndex()
+    idx.add(0, chess.Board("8/8/8/3N4/8/8/8/8 w - - 0 1"))
+    idx.add(1, chess.Board("8/8/8/3N4/4P3/8/8/8 w - - 0 1"))
+    idx.save(str(tmp_path))
+    assert empty_square(BitmapIndex.load(str(tmp_path)), "e4") == BitMap([0])
+
+def test_empty_square_after_merge():
+    from chess_search.indexes.bitmap.query import empty_square
+    a, b = BitmapIndex(), BitmapIndex()
+    a.add_source("x", [chess.Board("8/8/8/3N4/8/8/8/8 w - - 0 1")])
+    b.add_source("y", [chess.Board("8/8/8/3N4/8/8/8/8 w - - 0 1")])
+    a |= b
+    assert empty_square(a, "e4") == BitMap([0, 1])

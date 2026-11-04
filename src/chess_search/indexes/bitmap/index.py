@@ -47,6 +47,7 @@ class BitmapIndex:
                 txn.put(token.encode(), bitmap.serialize(), db=bitmap_db)
             txn.put(b"next_id", str(self._next_id).encode(), db=meta_db)
             txn.put(b"metadata", json.dumps(self._metadata).encode(), db=meta_db)
+            txn.put(b"all_positions", self._all_positions.serialize(), db=meta_db)
         env.close()
 
     @classmethod
@@ -68,6 +69,8 @@ class BitmapIndex:
             if meta_raw:
                 idx._metadata = [tuple(x) for x in json.loads(meta_raw)]
                 idx._next_id = int(txn.get(b"next_id", db=meta_db))
+            idx._all_positions = BitMap.deserialize(txn.get(b"all_positions", db=meta_db))
+
         env.close()
         return idx
 
@@ -117,11 +120,12 @@ class BitmapIndex:
     def __ior__(self, other):
         offset = self._next_id
         for token, bitmap in other.index.items():
-            shifted = BitMap(pos_id + offset for pos_id in bitmap)
+            shifted = bitmap.shift(offset)
             if token in self.index:
                 self.index[token] |= shifted
             else:
                 self.index[token] = shifted
+        self._all_positions |= other._all_positions.shift(offset)
         self._metadata.extend(other._metadata)
         self._next_id += other._next_id
         return self
