@@ -1,6 +1,6 @@
-.PHONY:all lint format test
+.PHONY: all lint fix format test
 
-all: lint format test
+all: fix format test
 
 lint:
 	ruff check src/ tests/
