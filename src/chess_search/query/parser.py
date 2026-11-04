@@ -1,7 +1,7 @@
 from pathlib import Path
 from lark import Lark, Transformer
 
-from chess_search.sparse.bitmap.expressions import (
+from chess_search.query.expressions import (
     And,
     Anywhere,
     Empty,

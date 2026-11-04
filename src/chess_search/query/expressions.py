@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from chess_search.sparse.bitmap.query import on_file, on_rank, in_center, anywhere, empty_square, open_file
+from chess_search.indexes.bitmap.query import on_file, on_rank, in_center, anywhere, empty_square, open_file
 
 
 class Query:

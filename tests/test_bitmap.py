@@ -1,5 +1,5 @@
 import chess
-from chess_search.sparse.bitmap.index import BitmapIndex
+from chess_search.indexes.bitmap.index import BitmapIndex
 from pyroaring import BitMap
 
 
@@ -98,7 +98,7 @@ def test_fixture_roundtrip():
 
 def test_pgn_indexing():
     import chess.pgn
-    from chess_search.sparse.bitmap.query import on_file
+    from chess_search.indexes.bitmap.query import on_file
 
     idx = BitmapIndex()
     with open("tests/fixtures/lichess_db_broadcast_2020-04.pgn") as f:
@@ -116,7 +116,7 @@ def test_pgn_indexing():
 
 
 def test_on_file():
-    from chess_search.sparse.bitmap.query import on_file, anywhere
+    from chess_search.indexes.bitmap.query import on_file, anywhere
 
     idx = BitmapIndex()
     b = chess.Board()
@@ -129,7 +129,7 @@ def test_on_file():
 
 
 def test_on_rank():
-    from chess_search.sparse.bitmap.query import on_rank
+    from chess_search.indexes.bitmap.query import on_rank
 
     idx = BitmapIndex()
     b = chess.Board()
@@ -141,7 +141,7 @@ def test_on_rank():
 
 
 def test_in_center():
-    from chess_search.sparse.bitmap.query import in_center
+    from chess_search.indexes.bitmap.query import in_center
 
     idx = BitmapIndex()
     b = chess.Board("8/8/8/3N4/4P3/8/8/8 w - - 0 1")  # N on d5, P on e4
@@ -155,7 +155,7 @@ def test_in_center():
 
 
 def test_on_color():
-    from chess_search.sparse.bitmap.query import on_color
+    from chess_search.indexes.bitmap.query import on_color
 
     idx = BitmapIndex()
     b = chess.Board("8/8/8/8/8/3R4/8/2B5 w - - 0 1")  # B on c1 (dark), R on d3 (light)
@@ -167,7 +167,7 @@ def test_on_color():
 
 
 def test_empty_square():
-    from chess_search.sparse.bitmap.query import empty_square
+    from chess_search.indexes.bitmap.query import empty_square
 
     idx = BitmapIndex()
     b1 = chess.Board("8/8/8/3N4/8/8/8/8 w - - 0 1")  # knight on d5 only
@@ -192,7 +192,7 @@ def test_side_to_move():
 
 
 def test_square_queries():
-    from chess_search.sparse.bitmap.query import on_square, any_white_on, any_black_on, piece_on
+    from chess_search.indexes.bitmap.query import on_square, any_white_on, any_black_on, piece_on
 
     idx = BitmapIndex()
     b = chess.Board("8/8/8/3N4/8/8/8/3n4 w - - 0 1")  # white N on d5, black n on d1
@@ -208,7 +208,7 @@ def test_square_queries():
 
 
 def test_open_and_semi_open_file():
-    from chess_search.sparse.bitmap.query import open_file, semi_open_file
+    from chess_search.indexes.bitmap.query import open_file, semi_open_file
 
     idx = BitmapIndex()
     b1 = chess.Board("8/8/8/8/8/8/8/8 w - - 0 1")  # empty board
@@ -226,32 +226,32 @@ def test_open_and_semi_open_file():
 
 
 def test_flipcolor():
-    from chess_search.sparse.bitmap.query import flipcolor
+    from chess_search.indexes.bitmap.query import flipcolor
 
     assert flipcolor(["P_e4", "N_f3"]) == ["p_e4", "n_f3"]
     assert flipcolor(["p_e4", "n_f3"]) == ["P_e4", "N_f3"]
 
 
 def test_mirror_vertical():
-    from chess_search.sparse.bitmap.query import mirror_vertical
+    from chess_search.indexes.bitmap.query import mirror_vertical
 
     assert mirror_vertical(["P_e4", "N_f3"]) == ["P_d4", "N_c3"]
 
 
 def test_mirror_horizontal():
-    from chess_search.sparse.bitmap.query import mirror_horizontal
+    from chess_search.indexes.bitmap.query import mirror_horizontal
 
     assert mirror_horizontal(["P_e4", "N_f3"]) == ["P_e5", "N_f6"]
 
 
 def test_rotate_180():
-    from chess_search.sparse.bitmap.query import rotate_180
+    from chess_search.indexes.bitmap.query import rotate_180
 
     assert rotate_180(["P_e4"]) == ["P_d5"]
 
 
 def test_flipcolor_with_index():
-    from chess_search.sparse.bitmap.query import flipcolor
+    from chess_search.indexes.bitmap.query import flipcolor
 
     idx = BitmapIndex()
     b1 = chess.Board("8/8/8/8/4P3/5N2/8/8 w - - 0 1")  # white P e4, N f3
