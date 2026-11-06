@@ -78,13 +78,27 @@ class BitmapIndex:
         return [self._metadata[pos_id] for pos_id in bitmap]
 
     @classmethod
-    def build_index(cls, sources, total=None):
+    def build_index(cls, sources, total=None, progress=True):
         from tqdm import tqdm
 
         idx = cls()
-        for source_id, boards in tqdm(sources, total=total):
+        for source_id, boards in tqdm(sources, total=total, disable=not progress):
             idx.add_source(source_id, boards)
         return idx
+
+    @classmethod
+    def build_parallel(cls, shards):
+        from multiprocessing import Pool
+
+        idx = cls()
+        with Pool(len(shards)) as pool:
+            for part in pool.imap(cls._build_shard, shards):
+                idx |= part
+        return idx
+
+    @classmethod
+    def _build_shard(cls, shard):
+        return cls.build_index(shard(), progress=False)
 
     def push_to_hub(self, repo_id):
         import tempfile

@@ -61,7 +61,33 @@ def test_add_source_and_resolve():
     assert results == BitMap([0, 1])
     assert idx.resolve(results) == [("abc", 0), ("abc", 1)]
 
+def test_build_parallel_matches_sequential():
+    import json
+    from functools import partial
 
+    from chess_search.sources import puzzles
+
+    with open("tests/fixtures/puzzles-sample.jsonl") as f:
+        rows = [json.loads(line) for line in f]
+    seq = BitmapIndex.build_index(puzzles(rows))
+    par = BitmapIndex.build_parallel([partial(puzzles, rows[:300]), partial(puzzles, rows[300:700]), partial(puzzles, rows[700:])])
+    assert par.index == seq.index
+    assert par._metadata == seq._metadata
+    assert par._all_positions == seq._all_positions
+
+def test_build_parallel_order():
+    import json
+    from functools import partial
+
+    from chess_search.sources import puzzles
+
+    with open("tests/fixtures/puzzles-sample.jsonl") as f:
+        rows = [json.loads(line) for line in f]
+    pairs = list(puzzles(rows))
+    par = BitmapIndex.build_parallel([partial(puzzles, rows[:500]), partial(puzzles, rows[500:])])
+    assert par._metadata == [(pid, j) for pid, boards in pairs for j in range(len(boards))]
+    assert par._all_positions == BitMap(range(len(par._metadata)))
+    
 def test_merge_with_metadata():
     a = BitmapIndex()
     b_idx = BitmapIndex()
