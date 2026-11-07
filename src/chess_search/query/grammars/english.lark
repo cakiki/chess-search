@@ -4,7 +4,7 @@ start: _NL? line (_NL line)* _NL?
 
 ?expr: expr "or" expr     -> or_expr
      | expr "and" expr    -> and_expr
-     | "not" expr         -> not_expr
+     | _NOT expr         -> not_expr
      | "(" expr ")"
      | predicate
 
@@ -20,6 +20,7 @@ start: _NL? line (_NL line)* _NL?
 
 piece: COLOR? PIECE_NAME
 
+_NOT: "not" | "no"
 PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn"
 FILE: /[a-h]/
 RANK: /[1-8]/

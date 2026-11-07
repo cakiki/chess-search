@@ -2,8 +2,14 @@ import chess
 from pyroaring import BitMap
 
 from chess_search.indexes.bitmap import BitmapIndex
-from chess_search.query.expressions import And, Empty, Not, OnFile, Or, Phase, execute
+from chess_search.query.expressions import And, Anywhere, Empty, Not, OnFile, Or, Phase, SideToMove, execute
 from chess_search.query.parser import parse
+
+
+def test_not():
+    assert parse("no queen anywhere") == Not(Or(Anywhere("Q"), Anywhere("q")))
+    assert parse("not empty e4") == Not(Empty("e4"))
+    assert parse("not black to move") == Not(SideToMove("b"))
 
 
 def test_parse_piece_colour():
