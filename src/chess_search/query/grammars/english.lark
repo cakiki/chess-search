@@ -8,17 +8,17 @@ start: _NL? line (_NL line)* _NL?
      | "(" expr ")"
      | predicate
 
-?predicate: piece "on" FILE FILE_SUFFIX  -> on_file
-          | piece "on" RANK RANK_SUFFIX  -> on_rank
-          | piece "in" "center"          -> in_center
-          | piece "anywhere"             -> anywhere
-          | "empty" SQUARE               -> empty
-          | "open" FILE FILE_SUFFIX      -> open_file
-          | PHASE_KW PHASE               -> phase
-          | piece "on" SQUARE            -> piece_on
-          | COLOR "to" "move"            -> side_to_move
+?predicate: piece "on" FILE _FILE_SUFFIX    -> on_file
+          | piece "on" RANK _RANK_SUFFIX    -> on_rank
+          | piece "in" "center"             -> in_center
+          | piece "anywhere"                -> anywhere
+          | "empty" SQUARE                  -> empty
+          | "open" FILE _FILE_SUFFIX        -> open_file
+          | _PHASE_KW PHASE                 -> phase
+          | piece "on" SQUARE               -> piece_on
+          | COLOR "to" "move"               -> side_to_move
 
-piece: PIECE_NAME
+piece: COLOR? PIECE_NAME
 
 PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn"
 FILE: /[a-h]/
@@ -26,9 +26,9 @@ RANK: /[1-8]/
 SQUARE: /[a-h][1-8]/
 PHASE: "opening" | "middlegame" | "endgame"
 COLOR: "white" | "black"
-FILE_SUFFIX: "-file"
-RANK_SUFFIX: "-rank"
-PHASE_KW: "phase"
+_FILE_SUFFIX: "-file"
+_RANK_SUFFIX: "-rank"
+_PHASE_KW: "phase"
 _NL: /\n/+
 
 %import common.WS_INLINE

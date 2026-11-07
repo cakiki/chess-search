@@ -1,3 +1,4 @@
+from functools import reduce
 from pathlib import Path
 
 from lark import Lark, Transformer
@@ -22,21 +23,31 @@ GRAMMAR_PATH = Path(__file__).parent / "grammars" / "english.lark"
 PIECE_MAP = {"rook": "R", "knight": "N", "bishop": "B", "queen": "Q", "king": "K", "pawn": "P"}
 
 
+def _any(nodes):
+    return reduce(Or, nodes)
+
+
 class QueryTransformer(Transformer):
     def piece(self, args):
-        return PIECE_MAP[str(args[0])]
+        # args is either [color, piece] or [piece]
+        symbol = PIECE_MAP[str(args[-1])]
+        if len(args) == 1:
+            return [symbol, symbol.lower()]  # [white, black]
+        else:
+            color = str(args[0])
+            return [symbol if (color == "white") else symbol.lower()]
 
     def on_file(self, args):
-        return OnFile(args[0], str(args[1]))
+        return _any(OnFile(p, str(args[1])) for p in args[0])
 
     def on_rank(self, args):
-        return OnRank(args[0], int(args[1]))
+        return _any(OnRank(p, int(args[1])) for p in args[0])
 
     def in_center(self, args):
-        return InCenter(args[0])
+        return _any(InCenter(p) for p in args[0])
 
     def anywhere(self, args):
-        return Anywhere(args[0])
+        return _any(Anywhere(p) for p in args[0])
 
     def empty(self, args):
         return Empty(str(args[0]))
@@ -48,7 +59,7 @@ class QueryTransformer(Transformer):
         return Phase(str(args[0]))
 
     def piece_on(self, args):
-        return PieceOn(args[0], str(args[1]))
+        return _any(PieceOn(p, str(args[1])) for p in args[0])
 
     def or_expr(self, args):
         return Or(args[0], args[1])
