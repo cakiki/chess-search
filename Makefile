@@ -1,4 +1,4 @@
-.PHONY: all lint fix format test
+.PHONY: all lint fix format test grammar
 
 all: fix format test
 
@@ -13,3 +13,6 @@ format:
 
 test:
 	pytest tests/
+
+grammar:
+	python -m chess_search.query.docs
