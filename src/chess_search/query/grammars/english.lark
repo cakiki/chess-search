@@ -4,29 +4,31 @@ start: _NL? line (_NL line)* _NL?
 
 ?expr: expr "or" expr     -> or_expr
      | expr "and" expr    -> and_expr
-     | _NOT expr         -> not_expr
+     | _NOT expr          -> not_expr
      | "(" expr ")"
      | predicate
 
-?predicate: piece "on" FILE _FILE_SUFFIX    -> on_file
-          | piece "on" RANK _RANK_SUFFIX    -> on_rank
-          | piece "in" "center"             -> in_center
-          | piece "anywhere"                -> anywhere
-          | "empty" SQUARE                  -> empty
-          | "open" FILE _FILE_SUFFIX        -> open_file
-          | _PHASE_KW PHASE                 -> phase
-          | piece "on" SQUARE               -> piece_on
-          | COLOR "to" "move"               -> side_to_move
+?predicate: piece "on" FILE _FILE_SUFFIX          -> on_file
+          | piece "on" RANK _RANK_SUFFIX          -> on_rank
+          | piece "in" "center"                   -> in_center
+          | piece "anywhere"                      -> anywhere
+          | piece "on" SQUARE_COLOR "squares"     -> on_color              
+          | "empty" SQUARE                        -> empty
+          | "open" FILE _FILE_SUFFIX              -> open_file
+          | _PHASE_KW PHASE                       -> phase
+          | piece "on" SQUARE                     -> piece_on
+          | COLOR "to" "move"                     -> side_to_move
 
 piece: COLOR? PIECE_NAME
 
 _NOT: "not" | "no"
-PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn"
+PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn" | "piece"
 FILE: /[a-h]/
 RANK: /[1-8]/
 SQUARE: /[a-h][1-8]/
 PHASE: "opening" | "middlegame" | "endgame"
 COLOR: "white" | "black"
+SQUARE_COLOR: "light" | "dark" | "white" | "black"
 _FILE_SUFFIX: "-file"
 _RANK_SUFFIX: "-rank"
 _PHASE_KW: "phase"

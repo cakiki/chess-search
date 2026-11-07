@@ -2,8 +2,20 @@ import chess
 from pyroaring import BitMap
 
 from chess_search.indexes.bitmap import BitmapIndex
-from chess_search.query.expressions import And, Anywhere, Empty, Not, OnFile, Or, Phase, SideToMove, execute
-from chess_search.query.parser import parse
+from chess_search.query.expressions import (
+    And,
+    Anywhere,
+    Empty,
+    Not,
+    OnColor,
+    OnFile,
+    Or,
+    Phase,
+    PieceOn,
+    SideToMove,
+    execute,
+)
+from chess_search.query.parser import _any, parse
 
 
 def test_not():
@@ -36,3 +48,20 @@ def test_execute_parsed_query():
     idx.add(1, chess.Board("8/8/8/8/8/8/8/R7 w - - 0 1"))
     assert execute(parse("white rook on b-file"), idx) == BitMap([0])
     assert execute(parse("not white rook on b-file"), idx) == BitMap([1])
+
+
+def test_execute_no_piece_on_dark_squares():
+    idx = BitmapIndex()
+    idx.add(0, chess.Board("8/8/8/8/8/8/8/1R6 w - - 0 1"))
+    idx.add(1, chess.Board("8/8/8/8/8/8/8/R7 w - - 0 1"))
+    assert execute(parse("no piece on dark squares"), idx) == BitMap([0])
+
+
+def test_on_color():
+    assert parse("bishop on white squares") == Or(OnColor("B", "light"), OnColor("b", "light"))
+    assert parse("black bishop on dark squares") == OnColor("b", "dark")
+
+
+def test_any_piece():
+    assert parse("white piece on e4") == _any(PieceOn(p, "e4") for p in "RNBQKP")
+    assert parse("piece on e4") == _any(PieceOn(p, "e4") for p in "RNBQKPrnbqkp")

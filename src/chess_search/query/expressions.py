@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from chess_search.indexes.bitmap.query import anywhere, empty_square, in_center, on_file, on_rank, open_file
+from chess_search.indexes.bitmap.query import anywhere, empty_square, in_center, on_color, on_file, on_rank, open_file
 
 
 class Query:
@@ -30,6 +30,12 @@ class OnFile(Query):
 class OnRank(Query):
     piece: str
     rank: int
+
+
+@dataclass(frozen=True)
+class OnColor(Query):
+    piece: str
+    color: str
 
 
 @dataclass(frozen=True)
@@ -87,6 +93,8 @@ def execute(expr, idx):
             return on_file(idx, piece, file)
         case OnRank(piece, rank):
             return on_rank(idx, piece, rank)
+        case OnColor(piece, color):
+            return on_color(idx, piece, color)
         case InCenter(piece):
             return in_center(idx, piece)
         case Anywhere(piece):

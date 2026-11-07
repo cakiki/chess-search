@@ -9,6 +9,7 @@ from chess_search.query.expressions import (
     Empty,
     InCenter,
     Not,
+    OnColor,
     OnFile,
     OnRank,
     OpenFile,
@@ -20,7 +21,8 @@ from chess_search.query.expressions import (
 
 GRAMMAR_PATH = Path(__file__).parent / "grammars" / "english.lark"
 
-PIECE_MAP = {"rook": "R", "knight": "N", "bishop": "B", "queen": "Q", "king": "K", "pawn": "P"}
+PIECE_MAP = {"rook": "R", "knight": "N", "bishop": "B", "queen": "Q", "king": "K", "pawn": "P", "piece": "RNBQKP"}
+SQUARE_COLOR_MAP = {"light": "light", "dark": "dark", "white": "light", "black": "dark"}
 
 
 def _any(nodes):
@@ -30,18 +32,21 @@ def _any(nodes):
 class QueryTransformer(Transformer):
     def piece(self, args):
         # args is either [color, piece] or [piece]
-        symbol = PIECE_MAP[str(args[-1])]
+        symbols = PIECE_MAP[str(args[-1])]
         if len(args) == 1:
-            return [symbol, symbol.lower()]  # [white, black]
+            return [*symbols, *symbols.lower()]  # [white, black]
         else:
             color = str(args[0])
-            return [symbol if (color == "white") else symbol.lower()]
+            return [*symbols] if (color == "white") else [*symbols.lower()]
 
     def on_file(self, args):
         return _any(OnFile(p, str(args[1])) for p in args[0])
 
     def on_rank(self, args):
         return _any(OnRank(p, int(args[1])) for p in args[0])
+
+    def on_color(self, args):
+        return _any(OnColor(p, SQUARE_COLOR_MAP[str(args[1])]) for p in args[0])
 
     def in_center(self, args):
         return _any(InCenter(p) for p in args[0])
