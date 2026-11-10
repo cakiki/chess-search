@@ -12,7 +12,7 @@ def test_build_and_query():
     idx.add(1, b)
     b.push_san("e5")
     idx.add(2, b)
-    assert len(idx) == 49
+    assert len(idx) == 54
     assert idx.query(["P_e4"]) == BitMap([1, 2])
     assert idx.query(["P_e4", "p_e5"]) == BitMap([2])
 
@@ -24,7 +24,7 @@ def test_merge():
     board.push_san("e4")
     b.add(1, board)
     a |= b
-    assert len(a) == 48
+    assert len(a) == 53
     assert a.query(["P_e2"]) == BitMap([0])
     assert a.query(["P_e4"]) == BitMap([1])
 
@@ -131,7 +131,7 @@ def test_pgn_indexing():
 
     with open("tests/fixtures/lichess_db_broadcast_2020-04.pgn") as f:
         idx = BitmapIndex.build_index(games(pgn(f)))
-    assert len(idx) == 713
+    assert len(idx) == 737
     assert idx._next_id == 7606
     assert len(on_file(idx, "R", "b")) == 557
 
@@ -292,6 +292,18 @@ def test_piece_counts():
     assert 0 in idx.query(["N_count_1"])
     assert 0 in idx.query(["Q_count_0"])
     assert 0 not in idx.query(["P_count_2"])
+
+
+def test_position_to_tokens():
+    from chess_search.indexes.bitmap.tokens import position_to_tokens
+
+    assert {"castling_K", "castling_Q", "castling_k", "castling_q", "material_0"} <= set(
+        position_to_tokens(chess.Board())
+    )
+    assert {"check", "checkmate", "material_+9"} <= set(
+        position_to_tokens(chess.Board("7k/6Q1/6K1/8/8/8/8/8 b - - 0 1"))
+    )
+    assert "stalemate" in position_to_tokens(chess.Board("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1"))
 
 
 def test_empty_square_after_load(tmp_path):
