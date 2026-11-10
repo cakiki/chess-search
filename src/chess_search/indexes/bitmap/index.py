@@ -20,11 +20,14 @@ class BitmapIndex:
             self.index[token].add(position_id)
         self._all_positions.add(position_id)
 
-    def add_source(self, source_id, boards):
+    def add_source(self, source_id, boards, tokens=()):
+        start = self._next_id
         for move_idx, board in enumerate(boards):
             self.add(self._next_id, board)
             self._metadata.append((source_id, move_idx))
             self._next_id += 1
+        for token in tokens:
+            self.index.setdefault(token, BitMap()).add_range(start, self._next_id)
 
     def query(self, tokens):
         bitmaps = [self.index[t] for t in tokens if t in self.index]
