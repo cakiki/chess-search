@@ -11,9 +11,14 @@ def replay_moves(fen, moves):
     return positions
 
 
-def puzzles(rows):
+def puzzles(rows, puzzle_id="PuzzleId", fen="FEN", moves="Moves", rating="Rating", themes="Themes"):
     for r in rows:
-        yield r["PuzzleId"], replay_moves(r["FEN"], r["Moves"].split())
+        tags = []
+        if themes:
+            tags += [f"theme_{t}" for t in r[themes]]
+        if rating:
+            tags.append(f"rating_{r[rating] // 100 * 100}")
+        yield r[puzzle_id], replay_moves(r[fen], r[moves].split()), tags
 
 
 def games(rows):

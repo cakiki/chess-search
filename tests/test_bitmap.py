@@ -62,34 +62,41 @@ def test_add_source_and_resolve():
     assert idx.resolve(results) == [("abc", 0), ("abc", 1)]
 
 
-def test_build_parallel_matches_sequential():
-    import json
+def test_add_source_tokens():
+    idx = BitmapIndex()
+    idx.add_source("x", [chess.Board(), chess.Board()], tokens=["theme_fork"])
+    idx.add_source("y", [chess.Board()])
+    idx.add_source("z", [chess.Board()], tokens=["theme_fork", "rating_1500"])
+    assert idx["theme_fork"] == BitMap([0, 1, 3])
+    assert idx["rating_1500"] == BitMap([3])
+
+
+def test_build_parallel_matches_sequential(puzzle_rows):
     from functools import partial
 
     from chess_search.sources import puzzles
 
-    with open("tests/fixtures/puzzles-sample.jsonl") as f:
-        rows = [json.loads(line) for line in f]
-    seq = BitmapIndex.build_index(puzzles(rows))
+    seq = BitmapIndex.build_index(puzzles(puzzle_rows))
     par = BitmapIndex.build_parallel(
-        [partial(puzzles, rows[:300]), partial(puzzles, rows[300:700]), partial(puzzles, rows[700:])]
+        [
+            partial(puzzles, puzzle_rows[:300]),
+            partial(puzzles, puzzle_rows[300:700]),
+            partial(puzzles, puzzle_rows[700:]),
+        ]
     )
     assert par.index == seq.index
     assert par._metadata == seq._metadata
     assert par._all_positions == seq._all_positions
 
 
-def test_build_parallel_order():
-    import json
+def test_build_parallel_order(puzzle_rows):
     from functools import partial
 
     from chess_search.sources import puzzles
 
-    with open("tests/fixtures/puzzles-sample.jsonl") as f:
-        rows = [json.loads(line) for line in f]
-    pairs = list(puzzles(rows))
-    par = BitmapIndex.build_parallel([partial(puzzles, rows[:500]), partial(puzzles, rows[500:])])
-    assert par._metadata == [(pid, j) for pid, boards in pairs for j in range(len(boards))]
+    sources = list(puzzles(puzzle_rows))
+    par = BitmapIndex.build_parallel([partial(puzzles, puzzle_rows[:500]), partial(puzzles, puzzle_rows[500:])])
+    assert par._metadata == [(pid, j) for pid, boards, _ in sources for j in range(len(boards))]
     assert par._all_positions == BitMap(range(len(par._metadata)))
 
 
@@ -108,16 +115,13 @@ def test_merge_with_metadata():
     assert a._next_id == 2
 
 
-def test_fixture_roundtrip():
-    import json
-
+def test_fixture_roundtrip(puzzle_rows):
     from chess_search.indexes.bitmap.tokens import position_to_tokens
     from chess_search.sources import puzzles
 
-    with open("tests/fixtures/puzzles-sample.jsonl") as f:
-        pairs = list(puzzles(json.loads(line) for line in f))
-    idx = BitmapIndex.build_index(pairs)
-    all_boards = [b for _, boards in pairs for b in boards]
+    sources = list(puzzles(puzzle_rows))
+    idx = BitmapIndex.build_index(sources)
+    all_boards = [b for _, boards, _ in sources for b in boards]
 
     for pos_id in [0, 100, 500, len(all_boards) - 1]:
         tokens = position_to_tokens(all_boards[pos_id])

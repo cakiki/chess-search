@@ -85,8 +85,8 @@ class BitmapIndex:
         from tqdm import tqdm
 
         idx = cls()
-        for source_id, boards in tqdm(sources, total=total, disable=not progress):
-            idx.add_source(source_id, boards)
+        for item in tqdm(sources, total=total, disable=not progress):
+            idx.add_source(*item)
         return idx
 
     @classmethod
