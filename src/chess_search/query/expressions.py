@@ -92,6 +92,8 @@ class SideToMove(Query):
 
 def execute(expr, idx):
     match expr:
+        case Token(name):
+            return idx.union([name])        
         case PieceOn(piece, square):
             return idx.query([f"{piece}_{square}"])
         case OnFile(piece, file):
