@@ -91,6 +91,12 @@ class QueryTransformer(Transformer):
     def side_to_move(self, args):
         return SideToMove("w" if str(args[0]) == "white" else "b")
 
+    def can_castle(self, args):
+        symbols = "KQ" if str(args[0]) == "white" else "kq"
+        if len(args) > 1:
+            symbols = symbols[0] if str(args[1]) == "kingside" else symbols[1]
+        return _any(Tag(f"castling_{s}") for s in symbols)
+
 
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")
 

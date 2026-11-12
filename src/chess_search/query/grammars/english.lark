@@ -19,6 +19,7 @@ start: _NL? line (_NL line)* _NL?
           | piece "on" SQUARE                     -> piece_on
           | COLOR "to" "move"                     -> side_to_move
           | STATE                                 -> state
+          | COLOR "can" "castle" SIDE?            -> can_castle
 
 piece: COLOR? PIECE_NAME
 
@@ -33,6 +34,7 @@ FILE: /[a-h]/
 PHASE: "opening" | "middlegame" | "endgame"
 PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn" | "piece"
 RANK: /[1-8]/
+SIDE: "kingside" | "queenside"          
 SQUARE: /[a-h][1-8]/
 SQUARE_COLOR: "light" | "dark" | "white" | "black"
 STATE: "checkmate" | "stalemate" | "check"

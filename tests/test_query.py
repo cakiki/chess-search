@@ -72,3 +72,8 @@ def test_state():
     idx.add(1, chess.Board())
     assert execute(parse("black to move\nno checkmate"), idx) == BitMap([])
     assert execute(parse("checkmate"), idx) == BitMap([0])
+
+
+def test_can_castle():
+    assert parse("white can castle") == Or(Tag("castling_K"), Tag("castling_Q"))
+    assert parse("black can castle queenside") == Tag("castling_q")
