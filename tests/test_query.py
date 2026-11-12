@@ -13,6 +13,7 @@ from chess_search.query.expressions import (
     Phase,
     PieceOn,
     SideToMove,
+    Tag,
     execute,
 )
 from chess_search.query.parser import _any, parse
@@ -65,3 +66,13 @@ def test_on_color():
 def test_any_piece():
     assert parse("white piece on e4") == _any(PieceOn(p, "e4") for p in "RNBQKP")
     assert parse("piece on e4") == _any(PieceOn(p, "e4") for p in "RNBQKPrnbqkp")
+
+
+def test_state():
+    assert parse("checkmate") == Tag("checkmate")
+    assert parse("no check") == Not(Tag("check"))
+    idx = BitmapIndex()
+    idx.add(0, chess.Board("7k/6Q1/6K1/8/8/8/8/8 b - - 0 1"))
+    idx.add(1, chess.Board())
+    assert execute(parse("black to move\nno checkmate"), idx) == BitMap([])
+    assert execute(parse("checkmate"), idx) == BitMap([0])
