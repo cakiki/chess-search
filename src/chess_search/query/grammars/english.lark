@@ -18,21 +18,24 @@ start: _NL? line (_NL line)* _NL?
           | _PHASE_KW PHASE                       -> phase
           | piece "on" SQUARE                     -> piece_on
           | COLOR "to" "move"                     -> side_to_move
+          | STATE                                 -> state
 
 piece: COLOR? PIECE_NAME
 
+_FILE_SUFFIX: "-file"
+_NL: /\n/+
 _NOT: "not" | "no"
-PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn" | "piece"
+_PHASE_KW: "phase"
+_RANK_SUFFIX: "-rank"
+
+COLOR: "white" | "black"
 FILE: /[a-h]/
+PHASE: "opening" | "middlegame" | "endgame"
+PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn" | "piece"
 RANK: /[1-8]/
 SQUARE: /[a-h][1-8]/
-PHASE: "opening" | "middlegame" | "endgame"
-COLOR: "white" | "black"
 SQUARE_COLOR: "light" | "dark" | "white" | "black"
-_FILE_SUFFIX: "-file"
-_RANK_SUFFIX: "-rank"
-_PHASE_KW: "phase"
-_NL: /\n/+
+STATE: "checkmate" | "stalemate" | "check"
 
 %import common.WS_INLINE
 %ignore WS_INLINE
