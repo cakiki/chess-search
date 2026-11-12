@@ -15,6 +15,11 @@ class Query:
 
 
 @dataclass(frozen=True)
+class Token(Query):
+    name: str
+
+
+@dataclass(frozen=True)
 class PieceOn(Query):
     piece: str
     square: str
