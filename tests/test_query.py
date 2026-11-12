@@ -19,7 +19,7 @@ from chess_search.query.expressions import (
 from chess_search.query.parser import _any, parse
 
 
-def test_not():
+def test_parse_not():
     assert parse("no queen anywhere") == Not(Or(Anywhere("Q"), Anywhere("q")))
     assert parse("not empty e4") == Not(Empty("e4"))
     assert parse("not black to move") == Not(SideToMove("b"))
@@ -33,10 +33,6 @@ def test_parse_piece_colour():
 
 def test_parse_newline_is_and():
     assert parse("white rook on b-file\nphase endgame") == And(OnFile("R", "b"), Phase("endgame"))
-
-
-def test_parse_not():
-    assert parse("not empty e4") == Not(Empty("e4"))
 
 
 def test_parse_parentheses():
