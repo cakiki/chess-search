@@ -11,7 +11,14 @@ def replay_moves(fen, moves):
     return positions
 
 
-def puzzles(rows, puzzle_id: str = "PuzzleId", fen: str = "FEN", moves: str = "Moves", rating: str | None = "Rating", themes: str | None = "Themes"):
+def puzzles(
+    rows,
+    puzzle_id: str = "PuzzleId",
+    fen: str = "FEN",
+    moves: str = "Moves",
+    rating: str | None = "Rating",
+    themes: str | None = "Themes",
+):
     for r in rows:
         tags = []
         if themes:
