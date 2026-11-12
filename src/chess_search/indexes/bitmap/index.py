@@ -91,12 +91,14 @@ class BitmapIndex:
 
     @classmethod
     def build_parallel(cls, shards):
-        from multiprocessing import Pool
+        from multiprocessing import get_context
 
         idx = cls()
-        with Pool(len(shards)) as pool:
+        with get_context("forkserver").Pool(len(shards)) as pool:
             for part in pool.imap(cls._build_shard, shards):
                 idx |= part
+            pool.close()
+            pool.join()
         return idx
 
     @classmethod
