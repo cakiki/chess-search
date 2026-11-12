@@ -17,6 +17,7 @@ from chess_search.query.expressions import (
     Phase,
     PieceOn,
     SideToMove,
+    Tag,
 )
 
 GRAMMAR_PATH = Path(__file__).parent / "grammars" / "english.lark"
@@ -38,6 +39,9 @@ class QueryTransformer(Transformer):
         else:
             color = str(args[0])
             return [*symbols] if (color == "white") else [*symbols.lower()]
+
+    def state(self, args):
+        return Tag(str(args[0]))
 
     def on_file(self, args):
         return _any(OnFile(p, str(args[1])) for p in args[0])

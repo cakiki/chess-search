@@ -15,7 +15,7 @@ class Query:
 
 
 @dataclass(frozen=True)
-class Token(Query):
+class Tag(Query):
     name: str
 
 
@@ -92,8 +92,8 @@ class SideToMove(Query):
 
 def execute(expr, idx):
     match expr:
-        case Token(name):
-            return idx.union([name])        
+        case Tag(name):
+            return idx.union([name])
         case PieceOn(piece, square):
             return idx.query([f"{piece}_{square}"])
         case OnFile(piece, file):
