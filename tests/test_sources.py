@@ -10,7 +10,7 @@ def test_pgn_indexing():
 
     with open("tests/fixtures/lichess_db_broadcast_2020-04.pgn") as f:
         idx = BitmapIndex.build_index(games(pgn(f)))
-    assert len(idx) == 737
+    assert len(idx) == 738
     assert idx._next_id == 7606
     assert len(on_file(idx, "R", "b")) == 557
 

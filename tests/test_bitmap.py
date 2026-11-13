@@ -71,6 +71,13 @@ def test_add_source_tokens():
     assert idx["rating_1500"] == BitMap([3])
 
 
+def test_add_source_first_ply():
+    idx = BitmapIndex()
+    idx.add_source("x", [chess.Board(), chess.Board()])
+    idx.add_source("y", [chess.Board()])
+    assert idx["first_ply"] == BitMap([0, 2])
+
+
 def test_build_parallel_matches_sequential(puzzle_rows):
     from functools import partial
 

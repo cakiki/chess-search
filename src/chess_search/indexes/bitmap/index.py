@@ -26,6 +26,8 @@ class BitmapIndex:
             self.add(self._next_id, board)
             self._metadata.append((source_id, move_idx))
             self._next_id += 1
+        if self._next_id > start:
+            self.index.setdefault("first_ply", BitMap()).add(start)
         for token in tokens:
             self.index.setdefault(token, BitMap()).add_range(start, self._next_id)
 
