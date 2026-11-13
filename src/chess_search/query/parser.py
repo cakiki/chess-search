@@ -114,7 +114,8 @@ class QueryTransformer(Transformer):
         return Rating(int(args[0]), int(args[1]))
 
     def isolated_pawn(self, args):
-        return _any(IsolatedPawn(p, str(args[0])) for p in "Pp")
+        symbols = "Pp" if len(args) == 1 else ("P" if str(args[0]) == "white" else "p")
+        return _any(IsolatedPawn(p, str(args[-1])) for p in symbols)
 
 
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")

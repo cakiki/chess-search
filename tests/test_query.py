@@ -107,6 +107,7 @@ def test_rating():
 
 def test_isolated_pawn():
     assert parse("isolated d-pawn") == Or(IsolatedPawn("P", "d"), IsolatedPawn("p", "d"))
+    assert parse("isolated white d-pawn") == IsolatedPawn("P", "d")
     idx = BitmapIndex()
     idx.add(0, chess.Board("8/8/8/8/3P4/8/8/8 w - - 0 1"))
     idx.add(1, chess.Board("8/8/8/8/3P4/4P3/8/8 w - - 0 1"))

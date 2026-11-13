@@ -24,7 +24,7 @@ start: _NL? line (_NL line)* _NL?
           | "material" "equal"                    -> material_equal
           | "tag" TOKEN                           -> tag
           | "rating" INT "-" INT                  -> rating
-          | "isolated" FILE _PAWN_SUFFIX          -> isolated_pawn
+          | "isolated" COLOR? FILE _PAWN_SUFFIX          -> isolated_pawn
 
 piece: COLOR? PIECE_NAME
 
