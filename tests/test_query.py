@@ -13,6 +13,7 @@ from chess_search.query.expressions import (
     Or,
     Phase,
     PieceOn,
+    Rating,
     SideToMove,
     Tag,
     execute,
@@ -89,3 +90,15 @@ def test_material():
     idx.add(1, chess.Board())
     assert execute(parse("white up 9"), idx) == BitMap([0])
     assert execute(parse("material equal"), idx) == BitMap([1])
+
+
+def test_tag():
+    assert parse("tag theme_fork") == Tag("theme_fork")
+
+
+def test_rating():
+    assert parse("rating 1500-1800") == Rating(1500, 1800)
+    idx = BitmapIndex()
+    idx.add_source("x", [chess.Board()], tokens=["rating_1600"])
+    assert execute(parse("rating 1500-1800"), idx) == BitMap([0])
+    assert execute(parse("rating 1700-1900"), idx) == BitMap([])

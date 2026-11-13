@@ -17,6 +17,7 @@ from chess_search.query.expressions import (
     Or,
     Phase,
     PieceOn,
+    Rating,
     SideToMove,
     Tag,
 )
@@ -104,6 +105,12 @@ class QueryTransformer(Transformer):
 
     def material_equal(self, args):
         return Material(0, 0)
+
+    def tag(self, args):
+        return Tag(str(args[0]))
+
+    def rating(self, args):
+        return Rating(int(args[0]), int(args[1]))
 
 
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")

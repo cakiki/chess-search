@@ -22,7 +22,8 @@ start: _NL? line (_NL line)* _NL?
           | COLOR "can" "castle" SIDE?            -> can_castle
           | COLOR "up" INT                        -> material
           | "material" "equal"                    -> material_equal
-
+          | "tag" TOKEN                           -> tag
+          | "rating" INT "-" INT                  -> rating
 
 piece: COLOR? PIECE_NAME
 
@@ -42,6 +43,7 @@ SIDE: "kingside" | "queenside"
 SQUARE: /[a-h][1-8]/
 SQUARE_COLOR: "light" | "dark" | "white" | "black"
 STATE: "checkmate" | "stalemate" | "check"
+TOKEN: /[A-Za-z0-9_+-]+/
 
 %import common.WS_INLINE
 %ignore WS_INLINE

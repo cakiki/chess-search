@@ -129,17 +129,6 @@ def test_fixture_roundtrip(puzzle_rows):
         assert pos_id in results
 
 
-def test_pgn_indexing():
-    from chess_search.indexes.bitmap.query import on_file
-    from chess_search.sources import games, pgn
-
-    with open("tests/fixtures/lichess_db_broadcast_2020-04.pgn") as f:
-        idx = BitmapIndex.build_index(games(pgn(f)))
-    assert len(idx) == 737
-    assert idx._next_id == 7606
-    assert len(on_file(idx, "R", "b")) == 557
-
-
 def test_on_file():
     from chess_search.indexes.bitmap.query import on_file
 

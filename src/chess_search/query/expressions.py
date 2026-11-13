@@ -97,6 +97,12 @@ class Material(Query):
     hi: int
 
 
+@dataclass(frozen=True)
+class Rating(Query):
+    lo: int
+    hi: int
+
+
 def execute(expr, idx):
     match expr:
         case Tag(name):
@@ -129,5 +135,7 @@ def execute(expr, idx):
             return idx.query([color])
         case Material(lo, hi):
             return idx.union([material_token(n) for n in range(lo, hi + 1)])
+        case Rating(lo, hi):
+            return idx.union([f"rating_{b}" for b in range(lo // 100 * 100, hi + 1, 100)])
         case _:
             raise ValueError(f"unknown expression: {expr}")
