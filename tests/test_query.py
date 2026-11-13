@@ -6,6 +6,7 @@ from chess_search.query.expressions import (
     And,
     Anywhere,
     Empty,
+    IsolatedPawn,
     Material,
     Not,
     OnColor,
@@ -102,3 +103,11 @@ def test_rating():
     idx.add_source("x", [chess.Board()], tokens=["rating_1600"])
     assert execute(parse("rating 1500-1800"), idx) == BitMap([0])
     assert execute(parse("rating 1700-1900"), idx) == BitMap([])
+
+
+def test_isolated_pawn():
+    assert parse("isolated d-pawn") == Or(IsolatedPawn("P", "d"), IsolatedPawn("p", "d"))
+    idx = BitmapIndex()
+    idx.add(0, chess.Board("8/8/8/8/3P4/8/8/8 w - - 0 1"))
+    idx.add(1, chess.Board("8/8/8/8/3P4/4P3/8/8 w - - 0 1"))
+    assert execute(parse("isolated d-pawn"), idx) == BitMap([0])

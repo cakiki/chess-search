@@ -24,12 +24,14 @@ start: _NL? line (_NL line)* _NL?
           | "material" "equal"                    -> material_equal
           | "tag" TOKEN                           -> tag
           | "rating" INT "-" INT                  -> rating
+          | "isolated" FILE _PAWN_SUFFIX          -> isolated_pawn
 
 piece: COLOR? PIECE_NAME
 
 _FILE_SUFFIX: "-file"
 _NL: /\n/+
 _NOT: "not" | "no"
+_PAWN_SUFFIX: "-pawn"
 _PHASE_KW: "phase"
 _RANK_SUFFIX: "-rank"
 

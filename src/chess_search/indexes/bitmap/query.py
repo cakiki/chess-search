@@ -84,3 +84,9 @@ def mirror_horizontal(tokens):
 
 def rotate_180(tokens):
     return mirror_horizontal(mirror_vertical(tokens))
+
+
+def isolated_pawn(idx, piece, file):
+    i = "abcdefgh".index(file)
+    neighbours = "abcdefgh"[max(i - 1, 0) : i] + "abcdefgh"[i + 1 : i + 2]
+    return on_file(idx, piece, file) - idx.union([f"{piece}_{f}{r}" for f in neighbours for r in range(1, 9)])

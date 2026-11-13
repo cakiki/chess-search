@@ -8,6 +8,7 @@ from chess_search.query.expressions import (
     Anywhere,
     Empty,
     InCenter,
+    IsolatedPawn,
     Material,
     Not,
     OnColor,
@@ -111,6 +112,9 @@ class QueryTransformer(Transformer):
 
     def rating(self, args):
         return Rating(int(args[0]), int(args[1]))
+
+    def isolated_pawn(self, args):
+        return _any(IsolatedPawn(p, str(args[0])) for p in "Pp")
 
 
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")

@@ -1,6 +1,15 @@
 from dataclasses import dataclass
 
-from chess_search.indexes.bitmap.query import anywhere, empty_square, in_center, on_color, on_file, on_rank, open_file
+from chess_search.indexes.bitmap.query import (
+    anywhere,
+    empty_square,
+    in_center,
+    isolated_pawn,
+    on_color,
+    on_file,
+    on_rank,
+    open_file,
+)
 from chess_search.indexes.bitmap.tokens import material_token
 
 
@@ -103,6 +112,12 @@ class Rating(Query):
     hi: int
 
 
+@dataclass(frozen=True)
+class IsolatedPawn(Query):
+    piece: str
+    file: str
+
+
 def execute(expr, idx):
     match expr:
         case Tag(name):
@@ -137,5 +152,7 @@ def execute(expr, idx):
             return idx.union([material_token(n) for n in range(lo, hi + 1)])
         case Rating(lo, hi):
             return idx.union([f"rating_{b}" for b in range(lo // 100 * 100, hi + 1, 100)])
+        case IsolatedPawn(piece, file):
+            return isolated_pawn(idx, piece, file)
         case _:
             raise ValueError(f"unknown expression: {expr}")
