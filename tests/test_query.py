@@ -6,6 +6,7 @@ from chess_search.query.expressions import (
     And,
     Anywhere,
     Empty,
+    Material,
     Not,
     OnColor,
     OnFile,
@@ -77,3 +78,14 @@ def test_state():
 def test_can_castle():
     assert parse("white can castle") == Or(Tag("castling_K"), Tag("castling_Q"))
     assert parse("black can castle queenside") == Tag("castling_q")
+
+
+def test_material():
+    assert parse("white up 3") == Material(3, 3)
+    assert parse("black up 1") == Material(-1, -1)
+    assert parse("material equal") == Material(0, 0)
+    idx = BitmapIndex()
+    idx.add(0, chess.Board("7k/6Q1/6K1/8/8/8/8/8 b - - 0 1"))
+    idx.add(1, chess.Board())
+    assert execute(parse("white up 9"), idx) == BitMap([0])
+    assert execute(parse("material equal"), idx) == BitMap([1])

@@ -8,6 +8,7 @@ from chess_search.query.expressions import (
     Anywhere,
     Empty,
     InCenter,
+    Material,
     Not,
     OnColor,
     OnFile,
@@ -96,6 +97,13 @@ class QueryTransformer(Transformer):
         if len(args) > 1:
             symbols = symbols[0] if str(args[1]) == "kingside" else symbols[1]
         return _any(Tag(f"castling_{s}") for s in symbols)
+
+    def material(self, args):
+        n = int(args[1]) * (1 if str(args[0]) == "white" else -1)
+        return Material(n, n)
+
+    def material_equal(self, args):
+        return Material(0, 0)
 
 
 parser = Lark(GRAMMAR_PATH.read_text(), parser="earley")

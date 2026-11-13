@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from chess_search.indexes.bitmap.query import anywhere, empty_square, in_center, on_color, on_file, on_rank, open_file
+from chess_search.indexes.bitmap.tokens import material_token
 
 
 class Query:
@@ -90,6 +91,12 @@ class SideToMove(Query):
     color: str
 
 
+@dataclass(frozen=True)
+class Material(Query):
+    lo: int
+    hi: int
+
+
 def execute(expr, idx):
     match expr:
         case Tag(name):
@@ -120,5 +127,7 @@ def execute(expr, idx):
             return idx._all_positions - execute(child, idx)
         case SideToMove(color):
             return idx.query([color])
+        case Material(lo, hi):
+            return idx.union([material_token(n) for n in range(lo, hi + 1)])
         case _:
             raise ValueError(f"unknown expression: {expr}")

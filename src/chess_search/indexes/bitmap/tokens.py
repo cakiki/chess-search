@@ -33,3 +33,7 @@ def position_to_tokens(board):
     if board.is_stalemate():
         tokens.append("stalemate")
     return tokens
+
+
+def material_token(n):
+    return f"material_{n:+d}" if n else "material_0"

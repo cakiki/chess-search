@@ -20,6 +20,9 @@ start: _NL? line (_NL line)* _NL?
           | COLOR "to" "move"                     -> side_to_move
           | STATE                                 -> state
           | COLOR "can" "castle" SIDE?            -> can_castle
+          | COLOR "up" INT                        -> material
+          | "material" "equal"                    -> material_equal
+
 
 piece: COLOR? PIECE_NAME
 
@@ -31,6 +34,7 @@ _RANK_SUFFIX: "-rank"
 
 COLOR: "white" | "black"
 FILE: /[a-h]/
+INT: /[0-9]+/
 PHASE: "opening" | "middlegame" | "endgame"
 PIECE_NAME: "rook" | "knight" | "bishop" | "queen" | "king" | "pawn" | "piece"
 RANK: /[1-8]/
