@@ -2,8 +2,7 @@
 HalfKP input features
 Adapted from: https://github.com/official-stockfish/nnue-pytorch/blob/ee27aba80f82709c3859783ed4434201b1ef02cf/model/features/halfkp.py
 Last point in the nnue-pytorch repo to have a halfkp implementation
-Copyright (C) the nnue-pytorch
-authors, GPL-3.0
+Copyright (C) the nnue-pytorch authors, GPL-3.0
 """
 
 NUM_SQ = 64
