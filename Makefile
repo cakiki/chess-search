@@ -3,13 +3,13 @@
 all: fix format test
 
 lint:
-	ruff check src/ tests/
+	ruff check src/ tests/ scripts/
 
 fix:
-	ruff check --fix src/ tests/
+	ruff check --fix src/ tests/ scripts/
 
 format:
-	ruff format src/ tests/
+	ruff format src/ tests/ scripts/
 
 test:
 	pytest tests/
