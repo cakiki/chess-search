@@ -1,3 +1,5 @@
+import json
+
 import chess
 
 from chess_search.features import game_phase
@@ -22,3 +24,9 @@ def test_halfkp():
     assert halfkp(board) == halfkp(board.mirror())
     assert halfkp(board, mirror=False) != halfkp(board.mirror(), mirror=False)
 
+
+def test_halfkp_matches_nnue_pytorch():
+    with open("tests/fixtures/halfkp.json") as f:
+        cases = json.load(f)["cases"]
+    for case in cases:
+        assert halfkp(chess.Board(case["fen"]), mirror=False) == case["indices"]
