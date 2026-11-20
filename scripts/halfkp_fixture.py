@@ -17,7 +17,7 @@ import sys
 import chess
 
 sys.path.insert(0, f"{sys.argv[1]}/model")
-from features.halfkp import NUM_PLANES, NUM_SQ, Features  # noqa: E402
+from features.halfkp import NUM_PLANES, NUM_SQ, Features
 
 FENS = [
     chess.STARTING_FEN,
@@ -38,4 +38,5 @@ for fen in FENS:
     cases.append({"fen": fen, "indices": indices})
 
 commit = subprocess.check_output(["git", "-C", sys.argv[1], "rev-parse", "HEAD"], text=True).strip()
-json.dump({"source": "official-stockfish/nnue-pytorch", "commit": commit, "cases": cases}, open("tests/fixtures/halfkp.json", "w"), indent=1)
+with open("tests/fixtures/halfkp.json", "w") as f:
+    json.dump({"source": "official-stockfish/nnue-pytorch", "commit": commit, "cases": cases}, f, indent=1)
