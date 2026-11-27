@@ -10,10 +10,12 @@ Usage:
 
 import argparse
 from functools import partial
+import tempfile
 
 from datasets import load_dataset
 
 from chess_search.indexes.bitmap import BitmapIndex
+from chess_search.indexes.storage import push_to_hub
 from chess_search.sources import puzzles
 
 args = argparse.ArgumentParser()
@@ -28,4 +30,7 @@ idx = BitmapIndex.build_parallel(
     [partial(puzzles, ds.shard(args.shards, i, contiguous=True)) for i in range(args.shards)]
 )
 idx.info()
-idx.push_to_hub(args.repo_id)
+
+with tempfile.TemporaryDirectory() as tmp:
+    idx.save(tmp)
+    push_to_hub(tmp, args.repo_id)
