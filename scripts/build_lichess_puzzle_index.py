@@ -5,7 +5,7 @@
 """Build the Lichess puzzle index in parallel and push it to the Hub.
 
 Usage:
-    uv run scripts/build_puzzle_index.py christopher/chess-index --shards 4
+    uv run scripts/build_lichess_puzzle_index.py christopher/chess-index --shards 4
 """
 
 import argparse
