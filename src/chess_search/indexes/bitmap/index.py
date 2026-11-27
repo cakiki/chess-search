@@ -1,9 +1,9 @@
 import json
 
-import lmdb
 from pyroaring import BitMap
 
 from chess_search.indexes.bitmap.tokens import position_to_tokens
+from chess_search.indexes.storage import open_lmdb_env
 
 
 class BitmapIndex:
@@ -44,7 +44,7 @@ class BitmapIndex:
         return BitMap.union(*bitmaps)
 
     def save(self, path):
-        env = lmdb.open(path, map_size=2**40, max_dbs=2)
+        env = open_lmdb_env(path)
         bitmap_db = env.open_db(b"bitmaps")
         meta_db = env.open_db(b"metadata")
         with env.begin(write=True) as txn:
@@ -58,7 +58,7 @@ class BitmapIndex:
     @classmethod
     def load(cls, path, verbose=False):
         idx = cls()
-        env = lmdb.open(path, readonly=True, max_dbs=2)
+        env = open_lmdb_env(path, readonly=True)
         bitmap_db = env.open_db(b"bitmaps")
         meta_db = env.open_db(b"metadata")
         with env.begin(buffers=False) as txn:
@@ -106,24 +106,6 @@ class BitmapIndex:
     @classmethod
     def _build_shard(cls, shard):
         return cls.build_index(shard(), progress=False)
-
-    def push_to_hub(self, repo_id):
-        import tempfile
-
-        from huggingface_hub import HfApi
-
-        with tempfile.TemporaryDirectory() as tmp:
-            self.save(tmp)
-            api = HfApi()
-            api.create_repo(repo_id, repo_type="dataset", exist_ok=True)
-            api.upload_folder(folder_path=tmp, repo_id=repo_id, repo_type="dataset", ignore_patterns=["lock.mdb"])
-
-    @classmethod
-    def load_from_hub(cls, repo_id, verbose=False):
-        from huggingface_hub import snapshot_download
-
-        local_dir = snapshot_download(repo_id=repo_id, repo_type="dataset")
-        return cls.load(local_dir, verbose=verbose)
 
     def info(self, verbose=False):
         total_bytes = 0
