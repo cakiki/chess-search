@@ -21,7 +21,11 @@ args.add_argument("repo_id")
 args.add_argument("--shards", type=int, default=4)
 args = args.parse_args()
 
-ds = load_dataset("Lichess/chess-puzzles", split="train").select_columns(["PuzzleId", "FEN", "Moves", "Rating", "Themes"])
-idx = BitmapIndex.build_parallel([partial(puzzles, ds.shard(args.shards, i, contiguous=True)) for i in range(args.shards)])
+ds = load_dataset("Lichess/chess-puzzles", split="train").select_columns(
+    ["PuzzleId", "FEN", "Moves", "Rating", "Themes"]
+)
+idx = BitmapIndex.build_parallel(
+    [partial(puzzles, ds.shard(args.shards, i, contiguous=True)) for i in range(args.shards)]
+)
 idx.info()
 idx.push_to_hub(args.repo_id)
